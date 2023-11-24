@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+    environment {
+        USERNAME = 'rekha6116'
+        IMAGENAME = 'webapp'
+      
+    }
+    
+    stages {
+        stage('clean WS'){
+            steps{
+                script{
+                    cleanWs()
+                }
+                
+            }
+        }
+        
+        stage('git checkout') {
+            
+            steps {
+                git 'https://github.com/kunchalavikram1427/maven-employee-web-application.git'
+            }
+        }
+        
+        stage('Build Artifact'){
+            steps{
+                sh 'mvn clean package'
+                 }
+        }
+        
+        stage('Build image'){
+            steps{
+                sh "docker build -t $USERNAME/$IMAGENAME:$BUILD_NUMBER ."
+            }
+            
+        }
+        
+        stage('push docker image'){
+            steps{
+            sh  ' docker login --username rekha6116 --password-stdin < ~/password'
+       
+            sh 'docker push  $USERNAME/$IMAGENAME:$BUILD_NUMBER'
+            }
+        }
+      
+            
+            
+    }
+}
